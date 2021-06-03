@@ -73,7 +73,7 @@ disk_free_limit.absolute = 2GB
 
 ##### 1.2.2 basicConsume
 
-**prefetch count（预取消息数量），控制消息消费端预取数量的消息 未 给broker处理结果恢复，则不再去队列取消息。** 
+**prefetch count（预取消息数量），控制消息消费端预取数量的消息 未 给broker处理结果回复，则不再去队列取消息。** 
 
 > https://www.rabbitmq.com/consumer-prefetch.html 
 >
@@ -84,7 +84,8 @@ disk_free_limit.absolute = 2GB
 > ​		可以基于 Consumer 或者 channel 设置 prefetch count 的值，含义为 Consumer端的最大的 unacked messages 数目。当超过这个数值的消息未被确认，RabbitMQ 会停止投递新的消息给该消费者。  
 
 ~~~properties
-channel.basicQos(2); // 如果超过 2 条消息没有发送 ACK，当前消费者不再接受队列消息 channel.basicConsume(QUEUE_NAME, false, consumer);
+channel.basicQos(2); // 如果超过 2 条消息没有发送 ACK，当前消费者不再接受队列消息 
+channel.basicConsume(QUEUE_NAME, false, consumer);
 ~~~
 
 

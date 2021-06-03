@@ -4,6 +4,14 @@
 
 过滤器 和 拦截器 均体现了AOP的编程思想，都可以实现诸如日志记录、登录鉴权等功能，但二者的不同点也是比较多的，接下来一一说明。
 
+> 1.拦截器只会对Controller中请求或访问static目录下的资源请求起作用
+>
+> - preHandle()、postHandle() 方法执行的顺序相反
+>
+> 2.过滤器几乎可以对所有进入容器的请求起作用
+
+
+
 ## **1、实现原理不同**
 
 过滤器和拦截器 底层实现方式大不相同，过滤器 是基于函数回调的，拦截器 则是基于Java的反射机制（动态代理）实现的。
@@ -151,7 +159,7 @@ Interceptor 后置
 
 在拦截器中注入service，发起请求测试一下 ，竟然TM的报错了，debug跟一下发现注入的service怎么是Null啊？
 
-<img src=".\image\20210518003" alt="img" style="zoom:80%;" /><img src=".\image\20210518002" alt="img" style="zoom:80%;" />
+<img src=".\image\20210518002" alt="img" style="zoom:80%;" />
 
 这是因为加载顺序导致的问题，拦截器加载的时间点在springcontext之前，而Bean又是由spring进行管理。
 

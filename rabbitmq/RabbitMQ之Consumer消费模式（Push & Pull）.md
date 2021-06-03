@@ -63,8 +63,10 @@ connection.close();
 
 同样采用wirkshark工具来观察pull模式的AMQP过程，pull模式主要是通过channel,basicGet方法来获取消息，示例代码如下：
 
-```
-GetResponse response = channel.basicGet(QUEUE_NAME, false);System.out.println(new String(response.getBody()));channel.basicAck(response.getEnvelope().getDeliveryTag(),false);
+```java
+GetResponse response = channel.basicGet(QUEUE_NAME, false);
+System.out.println(newString(response.getBody()));
+channel.basicAck(response.getEnvelope().getDeliveryTag(),false);
 ```
 
 wireshark抓包结果：
