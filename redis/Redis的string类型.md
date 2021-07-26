@@ -29,13 +29,13 @@ Redis的string类型分类：
 
 ### 1.字符串
 
-#### 1.1redis client 到redis请求流程示意图
+#### 1.1Redis client 到Redis请求流程示意图
 
 
 
 <img src=".\images\watermark5" alt="img" style="zoom:80%;" />
 
-#### 1.2 redis string常用命令、数据类型
+#### 1.2 Redis string常用命令、数据类型
 
 
 

@@ -1,0 +1,20 @@
+
+1.既然持久化redis数据，那么如何保证从磁盘查询出来的效率就比较高呢？
+2.总结“Redis为什么会那么快”：https://www.163.com/dy/article/GA7CKOH905521CBB.html
+
+
+redis快从如下几点考虑：
+1.内存比磁盘快
+2.Redis网络模型是采用I/O多路复用器，对key的处理是单线程的，避免多线程之间的竞争，
+   省去了线程切换带来的时间和空间上的性能开销，也不会导致死锁问题。
+3.底层数据结构的设计，以及事务的设计和key过期策略，乃至key的查找，还有持久化，都为了快速这个特性而有了自己的特殊实现。
+4.Redis利用Pipeline加速查询速度的方法[](https://www.cnblogs.com/Terry-Wu/p/12090819.html)
+
+
+
+redis scan keys 的区别：
+
+
+
+【RabbitMQ】如何保证消息的顺序性+解决消息积压+设计消息队列中间件：
+https://blog.csdn.net/qq_26545305/article/details/108203087

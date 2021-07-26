@@ -156,7 +156,7 @@ Transaction的实现主要是对信道（Channel）的设置，主要的方法�
 
 ##### 2.2.1、mandatory = true + ReturnListener
 
-> mandatory   -->  rabbitTemplate.setMandatory(true);
+> mandatory   -->  rabbitTemplate.setMandatory(true);         -- mandatory ：强制的
 >
 > ReturnListener  -->  rabbitTemplate.setReturnCallback ( new RabbitTemplate.ReturnCallback(){......});
 
@@ -484,26 +484,107 @@ channel.basicAck(response.getEnvelope().getDeliveryTag(),false);
 
 
 
-### 6.多费者共同监听同一个队列，同一消息会不会发到多个消费者
+### 6. 多费者共同监听同一个队列，同一消息会不会发到多个消费者
 
 > 问题：
 >
 > RabbitMQ的一个队列多个消费者消费【如果部署两个消费者共同消费同一个队列】，会不会出现多个消费者消费了同一条信息？有的话如何避免？
 >
-> 当然，这个问题的前提是用direct模式，fanout模式也可以。
-
-答：JavaEdge微信好友给出的答案：
-JavaEdge:
-不会
-默认都是消费者竞争去抢消息的
-拉不就是消费者去拉取消息嘛一般都是 mq 默认的机制
-不然就得手动发消息给消费者，也就是推模式
-一般就用默认拉啥都不需要干
-配好了广播模式（fanout）或者直连模式（direct）就行
+> JavaEdge微信好友给出的答案：
+> 不会
+> 默认都是消费者竞争去抢消息的
+> 拉不就是消费者去拉取消息嘛一般都是 mq 默认的机制
+> 不然就得手动发消息给消费者，也就是推模式
+> 一般就用默认拉啥都不需要干
+> 配好了广播模式（fanout）或者直连模式（direct）就行
 
 
 
-#### 6.1RabbitMQ中@RabbitListener/@RabbitMQTemplate使用的是Pull or Push模式
+<img src=".\images\image-20210712140411664.png" alt="image-20210712140411664" style="zoom:70%;" />
+
+> 如下问题验证使用的代码在项目：
+>
+> D:\dev\rabbitmq-space\qingshan-03term-24class\gupaoedu-vip-springboot-project
+>
+> 
+>
+> <img src="..\rabbitmq\images\image-20210712154551667.png" alt="image-20210712154551667" style="zoom:67%;" />
+
+#### 6.1 RabbitMQ队列使用说明
+
+> **一个队列处理一种业务，同一个业务不能绑定多个不同队列**
+>
+> 除fanout广播交换器，除外，direct/topic交换器，绑定队列时，只能针对一种业务使用一个队列，切不可绑定多个队列，造成同一消息认为是多个不同的消息。
+
+易惑点：
+
+三种模式，分别能绑定多个队列还是绑定一个队列？
+
+- fanoutExchange 应该可以肯定是绑定多个队列，因为需要广播
+
+- rabbitmq 的 topic模式 是不是可以绑定多个队列？不可（例如：gupao.*）
+
+- rabbitmq 的 direct模式 是不是只能绑定一个队列? 不可
+
+  - 可以绑定，但是消息会重复。
+
+    经验证，direct 绑定多个queue和设置多consumer,consumer会收到重复数据，和队列数程正比。
+
+    原因：它会认为是队列数量的条数不同的消息。其实是同一条数据。
+
+  - > 
+    >
+    > 幸运儿:
+    > **有个问题问你下**： 
+    > **1.rabbitmq direct 模式 是不是只能绑定一个队列 绑定多了会使消息按倍数的重复接收到吧**
+    > **2.topic 是不是也是只能绑定一个队列呢**
+    >
+    > 邢腾（邢卜）:
+    > **一个队列处理一种业务，同一个业务不能绑定多个不同队列**
+    >
+    > 幸运儿:
+    > **这是在开发规范上做的规则限制** 
+    > **但是我说的这种情况 是可以绑定多队列的是吧 只不过接收消息会重复**
+    >
+    > 邢腾（邢卜）:
+    > **是的，它会认为是两条不同的消息**
+    >
+    > ~~~properties
+    > First Queue received msg... : a direct msg : 中原镖局:0
+    > First Queue received msg... : a direct msg : 中原镖局:0
+    > First Queue 2 received msg... : a direct msg : 中原镖局:1
+    > First Queue received msg... : a direct msg : 中原镖局:2
+    > First Queue 2 received msg... : a direct msg : 中原镖局:1
+    > First Queue 2 received msg... : a direct msg : 中原镖局:3
+    > First Queue received msg... : a direct msg : 中原镖局:2
+    > First Queue 2 received msg... : a direct msg : 中原镖局:3
+    > ~~~
+
+    
+
+
+
+#### 6.2 direct/topic 模式多消费者消费1个队列
+
+> 项目：gupaoedu-vip-springboot-project 
+>
+> 验证：“direct模式下，多消费者竞争去抢消息，且消息不会被另外一个消费者重复消费，分摊消费者压力。
+
+- direct模式: 
+
+  添加多个消费者，可以均摊消费压力。验证：“多消费者竞争去抢消息，且消息不会被另外一个消费者重复消费。”
+
+  <img src="..\rabbitmq\images\image-20210712150252318.png" alt="image-20210712150252318" style="zoom:80%;" />
+
+- topic模式
+
+  topicExchange  bind 一个queue ，使用两个consumer,也可分摊压力。
+
+<img src="..\rabbitmq\images\image-20210712160507725.png" alt="image-20210712160507725" style="zoom:67%;" />
+
+
+
+#### 6.3 RabbitMQ中@RabbitListener/@RabbitMQTemplate使用的是Pull or Push模式
 
 > @RabbitListener --> SimpleRabbitListenerContainerFactory  这种方式 使用的是pull还是push方式
 

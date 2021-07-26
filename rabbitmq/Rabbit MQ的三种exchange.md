@@ -29,13 +29,11 @@ Java代码
 
 ### 2. Fanout Exchange – 不处理路由键。
 
-你只需要简单的将队列绑定到交换机上。一个发送到交换机的消息都会被转发到与该交换机绑定的所有队列上。很像子网广播，每台子网内的主机都获得了一份复制的消息。Fanout交换机转发消息是最快的。
+你只需要简单的将队列绑定到交换机上。一**个发送到交换机的消息都会被转发到与该交换机绑定的所有队列上**。很像子网广播，每台子网内的主机都获得了一份复制的消息。Fanout交换机转发消息是最快的。
 
 ​    ![0](D:\学习\面试资料\java-interview\rabbitmq\images\1341) 
 
-Java代码  
-
-​    ![0](https://note.youdao.com/yws/public/resource/f04ff27f0e2268e4a1b0ffdd279c1947/xmlnote/6435B963C1D241BCB966351EBE36FA92/1339) 
+Java代码：
 
 ~~~java
  Channel channel = connection.createChannel(); 
